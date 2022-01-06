@@ -6,21 +6,13 @@
  */
 
 #include "config.h"
-
-#define mainFLASH_TASK_PRIORITY  (tskIDLE_PRIORITY + 1)
-#define IDLE_STACK_SIZE (configMINIMAL_STACK_SIZE + 10)
-
-void IdleTaskFunction (void * pvParameters)
-{
-	volatile long counter;
-	counter++;
-}
+#include "console.h"
 
 int main(void)
 {
-	xTaskHandle IdleTask;
+	status_t status;
 
-	xTaskCreate(IdleTask, (signed portCHAR *) "IDLE", IDLE_STACK_SIZE, 0, mainFLASH_TASK_PRIORITY, &IdleTaskFunction);
+	status = InitConsole();
 
 	while(1){
 

@@ -8,6 +8,8 @@
 #ifndef INC_CORE_CONFIG_H_
 #define INC_CORE_CONFIG_H_
 
+#include <stdlib.h>
+
 #include "armint.h"
 #include "91x_map.h"
 #include "FreeRTOS.h"

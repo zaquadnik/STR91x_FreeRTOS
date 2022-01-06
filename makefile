@@ -34,7 +34,7 @@ DDEFS =
 DADEFS = 
 
 # List all default directories to look for include files here
-DINCDIR =
+DINCDIR = 
 
 # List the default directory to look for the libraries here
 DLIBDIR =
@@ -65,6 +65,7 @@ UADEFS =
 # List C source files here
 SRC  = ./SRC/main.c \
 	   ./SRC/CORE/armint.c \
+	   ./SRC/CORE/console.c \
 	   ./SRC/RTOS/croutine.c \
 	   ./SRC/RTOS/heap_2.c \
 	   ./SRC/RTOS/port.c \
@@ -73,7 +74,6 @@ SRC  = ./SRC/main.c \
 	   ./SRC/RTOS/list.c \
 	   ./SRC/RTOS/mpu_wrappers.c \
 	   ./SRC/RTOS/timers.c \
-#	   ./SRC/STDLIB/91x_can.c \
 	   ./SRC/STDLIB/91x_enet.c \
 	   ./SRC/STDLIB/91x_fmi.c \
 	   ./SRC/STDLIB/91x_gpio.c \
@@ -90,10 +90,10 @@ ASRC = ./SRC/RTOS/portasm.s \
 	   ./SRC/CORE/rozbiegowka.s
 
 # List all user directories here
-UINCDIR = INC/ \
-		  INC/CORE/ \
-		  INC/STDLIB/ \
-		  INC/RTOS/
+UINCDIR = ./INC/ \
+		  ./INC/CORE/ \
+		  ./INC/STDLIB/ \
+		  ./INC/RTOS/
 
 # List the user directory to look for the libraries here
 ULIBDIR =

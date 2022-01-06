@@ -7,7 +7,7 @@
 /SRC/RTOS/*.lst
 /SRC/RTOS/*.o
 /SRC/STDLIB/*.lst
-/SRC/STDLIB/*.o
+/SRC/STDLIB/t*.o
 *.exe
 *.dmp
 *.map

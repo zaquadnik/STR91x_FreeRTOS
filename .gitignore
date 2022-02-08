@@ -1,5 +1,6 @@
 /.dep/
 /.settings/
+/out/
 /SRC/*.lst
 /SRC/*.o
 /SRC/CORE/*.lst

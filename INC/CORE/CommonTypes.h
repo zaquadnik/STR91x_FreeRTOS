@@ -10,6 +10,8 @@
 
 #include "91x_type.h"
 
+#define NULL 0
+
 typedef enum{
 	OK = 0,
 	FAILURE = 1,

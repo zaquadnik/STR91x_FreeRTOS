@@ -5,17 +5,19 @@
  *      Author: zaquadnik
  */
 
-void UndefinedHandler (void) __attribute__((interrupt("UNDEF"), naked))
+#include "ExceptionHandlers.h"
+
+__attribute__((interrupt("UNDEF"), naked)) void UndefinedHandler (void)
 {
 	while(1);
 }
 
-void PrefetchAbortHandler (void) __attribute__((interrupt("PABT"), naked))
+ __attribute__((interrupt("PABT"), naked)) void PrefetchAbortHandler (void)
 {
 	while(1);
 }
 
-void DataAbortHandler (void) __attribute__((interrupt("DABT"), naked))
+ __attribute__((interrupt("DABT"), naked)) void DataAbortHandler (void)
 {
 	while(1);
 }

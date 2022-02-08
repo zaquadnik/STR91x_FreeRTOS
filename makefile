@@ -1,186 +1,309 @@
-##############################################################################################
 #
-#       !!!! Do NOT edit this makefile with an editor which replace tabs by spaces !!!!    
-#
-##############################################################################################
-# 
-# On command line:
-#
-# make all = Create project
-#
-# make clean = Clean project files.
-#
-# To rebuild project do "make clean" and "make all".
+# Copyright Freddie Chopin 2013.
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
 
-##############################################################################################
-# Start of default section
+#
+# \file Makefile
+# \brief ARM makefile
+#
+# this makefile is based strongly on many examples found in the network
+#
+# \author Freddie Chopin, http://www.freddiechopin.pl http://www.distortec.com
+# \date 2013-04-02
 #
 
-TRGT = arm-none-eabi-
-CC   = $(TRGT)gcc
-CP   = $(TRGT)objcopy
-AS   = $(TRGT)gcc -x assembler-with-cpp
-SIZE = $(TRGT)size
-OBJDUMP = $(TRGT)objdump
-BIN  = $(CP) -O ihex 
+#----------------------------------------------------------------------------------------------------------------------#
+# toolchain configuration
+#----------------------------------------------------------------------------------------------------------------------#
 
-MCU  = arm966e-s
+TOOLCHAIN = arm-none-eabi-
 
-# List all default C defines here, like -D_DEBUG=1
-DDEFS = 
+CXX = $(TOOLCHAIN)g++
+CC = $(TOOLCHAIN)gcc
+AS = $(TOOLCHAIN)gcc -x assembler-with-cpp
+OBJCOPY = $(TOOLCHAIN)objcopy
+OBJDUMP = $(TOOLCHAIN)objdump
+SIZE = $(TOOLCHAIN)size
+RM = rm -f
 
-# List all default ASM defines here, like -D_DEBUG=1
-DADEFS = 
+#----------------------------------------------------------------------------------------------------------------------#
+# project configuration
+#----------------------------------------------------------------------------------------------------------------------#
 
-# List all default directories to look for include files here
-DINCDIR = 
-
-# List the default directory to look for the libraries here
-DLIBDIR =
-
-# List all default libraries here
-DLIBS = 
-
-#
-# End of default section
-##############################################################################################
-
-##############################################################################################
-# Start of user section
-#
-
-# Define project name here
+# project name
 PROJECT = main
 
-# Define linker script file here
-LDSCRIPT_ROM = ./LNK/str912-rom.ld
+# core type
+CORE = arm966e-s
 
-# List all user C define here, like -D_DEBUG=1
-UDEFS = 
+# linker script
+LD_SCRIPT = ./LNK/str912-rom.ld
 
-# Define ASM defines here
-UADEFS = 
+# output folder (absolute or relative path, leave empty for in-tree compilation)
+OUT_DIR = out
 
-# List C source files here
-SRC  = ./SRC/main.c \
-	   ./SRC/CORE/armint.c \
-	   ./SRC/CORE/console.c \
-	   ./SRC/RTOS/croutine.c \
-	   ./SRC/RTOS/heap_2.c \
-	   ./SRC/RTOS/port.c \
-	   ./SRC/RTOS/queue.c \
-	   ./SRC/RTOS/tasks.c \
-	   ./SRC/RTOS/list.c \
-	   ./SRC/RTOS/mpu_wrappers.c \
-	   ./SRC/RTOS/timers.c \
-	   ./SRC/STDLIB/91x_enet.c \
-	   ./SRC/STDLIB/91x_fmi.c \
-	   ./SRC/STDLIB/91x_gpio.c \
-	   ./SRC/STDLIB/91x_it.c \
-	   ./SRC/STDLIB/91x_lib.c \
-	   ./SRC/STDLIB/91x_scu.c \
-	   ./SRC/STDLIB/91x_tim.c \
-	   ./SRC/STDLIB/91x_uart.c \
-	   ./SRC/STDLIB/91x_vic.c \
-	   ./SRC/STDLIB/91x_wdg.c
+# global definitions for C++, C and ASM (e.g. "symbol_with_value=0xDEAD symbol_without_value")
+GLOBAL_DEFS =
 
-# List ASM source files here
-ASRC = ./SRC/RTOS/portasm.s \
-	   ./SRC/CORE/rozbiegowka.s
+# C++ definitions
+CXX_DEFS =
 
-# List all user directories here
-UINCDIR = ./INC/ \
-		  ./INC/CORE/ \
-		  ./INC/STDLIB/ \
-		  ./INC/RTOS/
+# C definitions
+C_DEFS =
 
-# List the user directory to look for the libraries here
-ULIBDIR =
+# ASM definitions
+AS_DEFS =
 
-# List all user libraries here
-ULIBS = 
+# include directories (absolute or relative paths to additional folders with
+# headers, current folder is always included)
+INC_DIRS = ./INC/ \
+		   ./INC/CORE/ \
+		   ./INC/RTOS/ \
+		   ./INC/STDLIB/
 
-# Define optimisation level here
-OPT = -O0
+# library directories (absolute or relative paths to additional folders with
+# libraries)
+LIB_DIRS =
+
+# libraries (additional libraries for linking, e.g. "-lm -lsome_name" to link
+# math library libm.a and libsome_name.a)
+LIBS =
+
+# additional directories with source files (absolute or relative paths to
+# folders with source files, current folder is always included)
+SRCS_DIRS = ./SRC/ \
+			./SRC/CORE/ \
+			./SRC/RTOS/ \
+			./SRC/STDLIB/
+
+# extension of C++ files
+CXX_EXT = cpp
+
+# wildcard for C++ source files (all files with CXX_EXT extension found in
+# current folder and SRCS_DIRS folders will be compiled and linked)
+CXX_SRCS = $(wildcard $(patsubst %, %/*.$(CXX_EXT), . $(SRCS_DIRS)))
+
+# extension of C files
+C_EXT = c
+
+# wildcard for C source files (all files with C_EXT extension found in current
+# folder and SRCS_DIRS folders will be compiled and linked)
+C_SRCS = $(wildcard $(patsubst %, %/*.$(C_EXT), . $(SRCS_DIRS)))
+
+# extension of ASM files
+AS_EXT = s
+
+# wildcard for ASM source files (all files with AS_EXT extension found in
+# current folder and SRCS_DIRS folders will be compiled and linked)
+AS_SRCS = $(wildcard $(patsubst %, %/*.$(AS_EXT), . $(SRCS_DIRS)))
+
+# optimization flags ("-O0" - no optimization, "-O1" - optimize, "-O2" -
+# optimize even more, "-Os" - optimize for size or "-O3" - optimize yet more)
+OPTIMIZATION = -O0
 
 # set to 1 to optimize size by removing unused code and data during link phase
 REMOVE_UNUSED = 1
 
-#
-# End of user defines
-##############################################################################################
+# set to 1 to compile and link additional code required for C++
+USES_CXX = 0
 
+# define warning options here
+CXX_WARNINGS = -Wall -Wextra
+C_WARNINGS = -Wall -Wstrict-prototypes -Wextra
 
-INCDIR  = $(patsubst %,-I%,$(DINCDIR) $(UINCDIR))
-LIBDIR  = $(patsubst %,-L%,$(DLIBDIR) $(ULIBDIR))
-DEFS    = $(DDEFS) $(UDEFS)
-ADEFS   = $(DADEFS) $(UADEFS)
-OBJS    = $(ASRC:.s=.o) $(SRC:.c=.o)
-LIBS    = $(DLIBS) $(ULIBS)
-MCFLAGS = -mcpu=$(MCU)
-DMP     = $(PROJECT)_rom.dmp
-ELF     = $(PROJECT)_rom.elf
+# C++ language standard ("c++98", "gnu++98" - default, "c++0x", "gnu++0x")
+CXX_STD = gnu++98
 
-ASFLAGS = $(MCFLAGS) -g -gdwarf-2 -Wa,-amhls=$(<:.s=.lst) $(ADEFS)
-CPFLAGS = $(MCFLAGS) $(OPT) -gdwarf-2 -mthumb-interwork -fomit-frame-pointer -Wall -Wstrict-prototypes -fverbose-asm -Wa,-ahlms=$(<:.c=.lst) $(DEFS)
-LDFLAGS_ROM = $(MCFLAGS) -nostartfiles -T$(LDSCRIPT_ROM) -Wl,-Map=$(PROJECT)_rom.map,--cref,--no-warn-mismatch $(LIBDIR)
+# C language standard ("c89" / "iso9899:1990", "iso9899:199409",
+# "c99" / "iso9899:1999", "gnu89" - default, "gnu99")
+C_STD = gnu89
 
-ifeq ($(REMOVE_UNUSED), 1)
-	LDFLAGS_ROM += -Wl,--gc-sections
-	OPT += -ffunction-sections -fdata-sections
+#----------------------------------------------------------------------------------------------------------------------#
+# set the VPATH according to SRCS_DIRS
+#----------------------------------------------------------------------------------------------------------------------#
+
+VPATH = $(SRCS_DIRS)
+
+#----------------------------------------------------------------------------------------------------------------------#
+# when using output folder, append trailing slash to its name
+#----------------------------------------------------------------------------------------------------------------------#
+
+ifeq ($(strip $(OUT_DIR)), )
+	OUT_DIR_F =
+else
+	OUT_DIR_F = $(strip $(OUT_DIR))/
 endif
 
-# Generate dependency information
-CPFLAGS += -MD -MP -MF .dep/$(@F).d
+#----------------------------------------------------------------------------------------------------------------------#
+# various compilation flags
+#----------------------------------------------------------------------------------------------------------------------#
 
-#
-# makefile rules
-#
+# core flags
+CORE_FLAGS = -mcpu=$(CORE) -mthumb-interwork -mfloat-abi=soft -mfpu=auto
 
-all: ROM
+# flags for C++ compiler
+CXX_FLAGS = -std=$(CXX_STD) -g -ggdb3 -fno-rtti -fno-exceptions -fverbose-asm -Wa,-ahlms=$(OUT_DIR_F)$(notdir $(<:.$(CXX_EXT)=.lst))
 
-ROM: $(OBJS) $(PROJECT)_rom.elf $(PROJECT)_rom.hex print_size $(DMP)
+# flags for C compiler
+C_FLAGS = -std=$(C_STD) -g -ggdb3 -fverbose-asm -Wa,-ahlms=$(OUT_DIR_F)$(notdir $(<:.$(C_EXT)=.lst))
+
+# flags for assembler
+AS_FLAGS = -g -ggdb3 -Wa,-amhls=$(OUT_DIR_F)$(notdir $(<:.$(AS_EXT)=.lst))
+
+# flags for linker
+LD_FLAGS = -T$(LD_SCRIPT) -g -Wl,-Map=$(OUT_DIR_F)$(PROJECT).map,--cref,--no-warn-mismatch
+
+# process option for removing unused code
+ifeq ($(REMOVE_UNUSED), 1)
+	LD_FLAGS += -Wl,--gc-sections
+	OPTIMIZATION += -ffunction-sections -fdata-sections
+endif
+
+# if __USES_CXX is defined for ASM then code for global/static constructors /
+# destructors is compiled; if -nostartfiles option for linker is added then C++
+# initialization / finalization code is not linked
+ifeq ($(USES_CXX), 1)
+	AS_DEFS += __USES_CXX
+else
+	LD_FLAGS += -nostartfiles
+endif
+
+#----------------------------------------------------------------------------------------------------------------------#
+# do some formatting
+#----------------------------------------------------------------------------------------------------------------------#
+
+CXX_OBJS = $(addprefix $(OUT_DIR_F), $(notdir $(CXX_SRCS:.$(CXX_EXT)=.o)))
+C_OBJS = $(addprefix $(OUT_DIR_F), $(notdir $(C_SRCS:.$(C_EXT)=.o)))
+AS_OBJS = $(addprefix $(OUT_DIR_F), $(notdir $(AS_SRCS:.$(AS_EXT)=.o)))
+OBJS = $(AS_OBJS) $(C_OBJS) $(CXX_OBJS) $(USER_OBJS)
+DEPS = $(OBJS:.o=.d)
+INC_DIRS_F = -I. $(patsubst %, -I%, $(INC_DIRS))
+LIB_DIRS_F = $(patsubst %, -L%, $(LIB_DIRS))
+GLOBAL_DEFS_F = $(patsubst %, -D%, $(GLOBAL_DEFS))
+CXX_DEFS_F = $(patsubst %, -D%, $(CXX_DEFS))
+C_DEFS_F = $(patsubst %, -D%, $(C_DEFS))
+AS_DEFS_F = $(patsubst %, -D%, $(AS_DEFS))
+
+ELF = $(OUT_DIR_F)$(PROJECT).elf
+HEX = $(OUT_DIR_F)$(PROJECT).hex
+BIN = $(OUT_DIR_F)$(PROJECT).bin
+LSS = $(OUT_DIR_F)$(PROJECT).lss
+DMP = $(OUT_DIR_F)$(PROJECT).dmp
+
+# format final flags for tools, request dependancies for C++, C and asm
+CXX_FLAGS_F = $(CORE_FLAGS) $(OPTIMIZATION) $(CXX_WARNINGS) $(CXX_FLAGS) $(GLOBAL_DEFS_F) $(CXX_DEFS_F) -MD -MP -MF $(OUT_DIR_F)$(@F:.o=.d) $(INC_DIRS_F)
+C_FLAGS_F = $(CORE_FLAGS) $(OPTIMIZATION) $(C_WARNINGS) $(C_FLAGS) $(GLOBAL_DEFS_F) $(C_DEFS_F) -MD -MP -MF $(OUT_DIR_F)$(@F:.o=.d) $(INC_DIRS_F)
+AS_FLAGS_F = $(CORE_FLAGS) $(AS_FLAGS) $(GLOBAL_DEFS_F) $(AS_DEFS_F) -MD -MP -MF $(OUT_DIR_F)$(@F:.o=.d) $(INC_DIRS_F)
+LD_FLAGS_F = $(CORE_FLAGS) $(LD_FLAGS) $(LIB_DIRS_F)
+
+#contents of output directory
+GENERATED = $(wildcard $(patsubst %, $(OUT_DIR_F)*.%, bin d dmp elf hex lss lst map o))
+
+#----------------------------------------------------------------------------------------------------------------------#
+# make all
+#----------------------------------------------------------------------------------------------------------------------#
+
+all : make_output_dir $(ELF) $(LSS) $(DMP) $(HEX) $(BIN) print_size
+
+# make object files dependent on Makefile
+$(OBJS) : Makefile
+# make .elf file dependent on linker script
+$(ELF) : $(LD_SCRIPT)
+
+# linking - objects -> elf
+
+$(ELF) : $(OBJS)
+	@echo 'Linking target: $(ELF)'
+	$(CXX) $(LD_FLAGS_F) $(OBJS) $(LIBS) -o $@
+	@echo ' '
+
+# compiling - C++ source -> objects
+
+$(OUT_DIR_F)%.o : %.$(CXX_EXT)
+	@echo 'Compiling file: $<'
+	$(CXX) -c $(CXX_FLAGS_F) $< -o $@
+	@echo ' '
+
+# compiling - C source -> objects
+
+$(OUT_DIR_F)%.o : %.$(C_EXT)
+	@echo 'Compiling file: $<'
+	$(CC) -c $(C_FLAGS_F) $< -o $@
+	@echo ' '
+
+# assembling - ASM source -> objects
+
+$(OUT_DIR_F)%.o : %.$(AS_EXT)
+	@echo 'Assembling file: $<'
+	$(AS) -c $(AS_FLAGS_F) $< -o $@
+	@echo ' '
+
+# memory images - elf -> hex, elf -> bin
+
+$(HEX) : $(ELF)
+	@echo 'Creating IHEX image: $(HEX)'
+	$(OBJCOPY) -O ihex $< $@
+	@echo ' '
+
+$(BIN) : $(ELF)
+	@echo 'Creating binary image: $(BIN)'
+	$(OBJCOPY) -O binary $< $@
+	@echo ' '
+
+# memory dump - elf -> dmp
 
 $(DMP) : $(ELF)
 	@echo 'Creating memory dump: $(DMP)'
 	$(OBJDUMP) -x --syms $< > $@
 	@echo ' '
 
-print_size:
+# extended listing - elf -> lss
+
+$(LSS) : $(ELF)
+	@echo 'Creating extended listing: $(LSS)'
+	$(OBJDUMP) --demangle -S $< > $@
+	@echo ' '
+
+# print the size of the objects and the .elf file
+
+print_size : $(OBJS) $(ELF)
 	@echo 'Size of modules:'
-	$(SIZE) -B -t --common $(OBJS)
+	$(SIZE) -B -t --common $(OBJS) $(USER_OBJS)
 	@echo ' '
 	@echo 'Size of target .elf file:'
-	$(SIZE) -B $(PROJECT)_rom.elf
+	$(SIZE) -B $(ELF)
 	@echo ' '
 
-%o : %c
-	$(CC) -c $(CPFLAGS) -I . $(INCDIR) $< -o $@
+# create the desired output directory
 
-%o : %s
-	$(AS) -c $(ASFLAGS) $< -o $@
-  
-%_rom.elf: $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS_ROM) $(LIBS) -o $@
+make_output_dir :
+	$(shell mkdir $(OUT_DIR_F) 2>/dev/null)
 
-%hex: %elf
-	$(BIN) $< $@
+#----------------------------------------------------------------------------------------------------------------------#
+# make clean
+#----------------------------------------------------------------------------------------------------------------------#
 
 clean:
-	-rm -f $(OBJS)
-	-rm -f $(PROJECT)_rom.elf
-	-rm -f $(PROJECT)_rom.map
-	-rm -f $(PROJECT)_rom.hex
-	-rm -f $(SRC:.c=.c.bak)
-	-rm -f $(SRC:.c=.lst)
-	-rm -f $(ASRC:.s=.s.bak)
-	-rm -f $(ASRC:.s=.lst)
-	-rm -fR .dep
+ifeq ($(strip $(OUT_DIR_F)), )
+	@echo 'Removing all generated output files'
+else
+	@echo 'Removing all generated output files from output directory: $(OUT_DIR_F)'
+endif
+ifneq ($(strip $(GENERATED)), )
+	$(RM) $(GENERATED)
+else
+	@echo 'Nothing to remove...'
+endif
 
-# 
-# Include the dependency files, should be the last of the makefile
-#
--include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
+#----------------------------------------------------------------------------------------------------------------------#
+# global exports
+#----------------------------------------------------------------------------------------------------------------------#
 
-# *** EOF ***
+.PHONY: all clean make_output_dir print_size
+
+.SECONDARY:
+
+# include dependancy files
+-include $(DEPS)

@@ -41,10 +41,10 @@ Vectors:        ldr     pc,Reset_Addr         	// RESET vector
                 LDR     PC,FIQ_Addr
 
 Reset_Addr:     .word   Reset_Handler
-Undef_Addr:     .word   Undef_Handler
+Undef_Addr:     .word   UndefinedHandler
 SWI_Addr:       .word   vPortYieldProcessor
-PAbt_Addr:      .word   PAbt_Handler
-DAbt_Addr:      .word   DAbt_Handler
+PAbt_Addr:      .word   PrefetchAbortHandler
+DAbt_Addr:      .word   DataAbortHandler
                 .word   0                      /* Reserved Address */
 IRQ_Addr:       .word   IRQ_Handler
 FIQ_Addr:       .word   FIQ_Handler

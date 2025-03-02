@@ -6,12 +6,21 @@
  */
 
 #include "config.h"
+#include "sysclk.h"
 #include "console.h"
+#include "heartbeat.h"
 
 int main(void)
 {
 	status_t status;
 
+	status = ScInitPll();
+	if (OK != status)
+	{
+		//TODO: Error Handling
+	}
+
+	status = HbInitHeartBeat();
 	status = InitConsole();
 
 	while(1){

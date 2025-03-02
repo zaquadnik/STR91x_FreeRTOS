@@ -23,5 +23,6 @@ typedef enum{
 	UNKNOWN = 0xFF
 }status_t;
 
+#define ConvertStatus(StdStatus) (StdStatus) ? OK : FAILURE;
 
 #endif /* INC_CORE_COMMONTYPES_H_ */
